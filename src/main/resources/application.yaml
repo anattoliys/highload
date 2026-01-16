@@ -3,3 +3,11 @@ server:
 spring:
   application:
     name: highload
+  datasource:
+    url: jdbc:postgresql://localhost:5432/highload-db
+    username: highload-user
+    password: 12345678
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
