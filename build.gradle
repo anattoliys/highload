@@ -1,7 +1,8 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.1'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '4.0.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id("org.openapi.generator") version "7.8.0"
 }
 
 group = 'ru.project'
@@ -9,21 +10,69 @@ version = '0.0.1-SNAPSHOT'
 description = 'Highload project'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def specifications = [
+        [
+
+                name     : 'OpenApi',
+                inputSpec: "$rootDir/spec/openapi.json",
+                package  : 'ru.project.highload.openapi',
+        ]
+]
+
+specifications.each { spec ->
+    tasks.register("generate${spec.name}", org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+        generatorName = 'spring'
+        inputSpec = spec.inputSpec
+        outputDir = "$buildDir/generated"
+        apiPackage = spec.package + '.api'
+        modelPackage = spec.package + '.dto'
+        configOptions = [
+                interfaceOnly       : 'true',
+                useSpringBoot3      : 'true',
+                dateLibrary         : 'java8',
+                useJakartaEe        : 'true',
+                skipDefaultInterface: "true"
+        ]
+    }
+}
+
+tasks.named("openApiGenerate").configure {
+    enabled = false
+}
+tasks.named("openApiGenerate") {
+    dependsOn specifications.collect { spec -> tasks.named("generate${spec.name}") }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated/src/main/java"
+        }
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('openApiGenerate')
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    dependsOn tasks.named('openApiGenerate')
 }
