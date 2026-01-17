@@ -1,5 +1,6 @@
 package ru.project.highload.user.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.project.highload.user.domain.User;
@@ -15,5 +16,9 @@ public class UserService {
 
     public UUID create(User user) {
         return repository.save(user);
+    }
+
+    public User findById(UUID id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found by id " + id));
     }
 }

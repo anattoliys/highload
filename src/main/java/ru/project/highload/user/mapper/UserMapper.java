@@ -13,4 +13,6 @@ public interface UserMapper {
     User toEntity(UserRegisterPostRequest userRequest);
 
     UserRegisterPost200Response userIdToDto(UUID userId);
+
+    ru.project.highload.openapi.dto.User toDto(User user);
 }

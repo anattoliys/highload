@@ -22,7 +22,7 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<User> userGetIdGet(String id) {
-        return null;
+        return ResponseEntity.ok(mapper.toDto(service.findById(UUID.fromString(id))));
     }
 
     @Override

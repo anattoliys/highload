@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.project.highload.user.domain.User;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -34,5 +35,17 @@ public class UserRepository {
                 .query(UUID.class);
 
         return Objects.requireNonNull(query, "Query cannot be null").single();
+    }
+
+    public Optional<User> findById(UUID id) {
+        var query = jdbcClient.sql("""
+                        SELECT id, first_name, second_name, birthdate, sex, biography, city, password, created_at, updated_at
+                        FROM users
+                        WHERE id = :id
+                        """)
+                .param("id", id)
+                .query(User.class);
+
+        return Objects.requireNonNull(query, "Query cannot be null").optional();
     }
 }
