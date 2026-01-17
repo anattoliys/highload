@@ -26,4 +26,4 @@ COMMENT ON COLUMN users.password IS 'Пароль пользователя';
 COMMENT ON COLUMN users.created_at IS 'Дата и время создания';
 COMMENT ON COLUMN users.updated_at IS 'Дата и время обновления';
 
-ALTER TABLE users ADD CONSTRAINT check_sex CHECK (sex IN ('Male', 'Female'));
+ALTER TABLE users ADD CONSTRAINT check_sex CHECK (sex IN ('MALE', 'FEMALE'));

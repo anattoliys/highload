@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import ru.project.highload.user.domain.Sex;
 import ru.project.highload.user.domain.User;
 
 import java.util.Objects;
@@ -28,7 +29,7 @@ public class UserRepository {
                 .param("first", user.getFirstName())
                 .param("last", user.getSecondName())
                 .param("birth", user.getBirthdate())
-                .param("sex", user.getSex())
+                .param("sex", Sex.fromValue(user.getSex()))
                 .param("bio", user.getBiography())
                 .param("city", user.getCity())
                 .param("pass", encodedPassword)

@@ -78,6 +78,15 @@
                   "birthdate": {
                     "$ref": "#/components/schemas/BirthDate"
                   },
+                  "sex": {
+                    "type": "string",
+                    "enum": [
+                      "MALE",
+                      "FEMALE"
+                    ],
+                    "example": "MALE",
+                    "description": "Пол пользователя"
+                  },
                   "biography": {
                     "type": "string",
                     "example": "Хобби, интересы и т.п."
@@ -689,6 +698,15 @@
           },
           "birthdate": {
             "$ref": "#/components/schemas/BirthDate"
+          },
+          "sex": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ],
+            "example": "MALE",
+            "description": "Пол пользователя"
           },
           "biography": {
             "type": "string",
