@@ -1,0 +1,17 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: highload
+  datasource:
+    url: jdbc:postgresql://localhost:5432/highload-db
+    username: highload-user
+    password: 12345678
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+jwt:
+  secret: 9a4f2c8d3b1e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e
+  expiration-time: 86400000
