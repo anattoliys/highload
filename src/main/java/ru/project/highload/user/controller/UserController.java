@@ -33,6 +33,6 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<List<User>> userSearchGet(String firstName, String lastName) {
-        return null;
+        return ResponseEntity.ok(mapper.toListDto(service.search(firstName, lastName)));
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.project.highload.user.domain.Sex;
 import ru.project.highload.user.domain.User;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,5 +49,19 @@ public class UserRepository {
                 .query(User.class);
 
         return Objects.requireNonNull(query, "Query cannot be null").optional();
+    }
+
+    public List<User> searchUsers(String firstName, String lastName) {
+        var query = jdbcClient.sql("""
+                        SELECT id, first_name, second_name, birthdate, sex, biography, city, password, created_at, updated_at
+                        FROM users
+                        WHERE first_name ILIKE :first AND second_name ILIKE :last
+                        ORDER BY id ASC
+                        """)
+                .param("first", firstName + "%")
+                .param("last", lastName + "%")
+                .query(User.class);
+
+        return Objects.requireNonNull(query, "Query specification cannot be null").list();
     }
 }
