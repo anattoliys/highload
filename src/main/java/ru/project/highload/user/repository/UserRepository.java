@@ -55,11 +55,11 @@ public class UserRepository {
         var query = jdbcClient.sql("""
                         SELECT id, first_name, second_name, birthdate, sex, biography, city, password, created_at, updated_at
                         FROM users
-                        WHERE first_name ILIKE :first AND second_name ILIKE :last
+                        WHERE LOWER(first_name) LIKE :first AND LOWER(second_name) LIKE :last
                         ORDER BY id ASC
                         """)
-                .param("first", firstName + "%")
-                .param("last", lastName + "%")
+                .param("first", firstName.toLowerCase() + "%")
+                .param("last", lastName.toLowerCase() + "%")
                 .query(User.class);
 
         return Objects.requireNonNull(query, "Query specification cannot be null").list();
