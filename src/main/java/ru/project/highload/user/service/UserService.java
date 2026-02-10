@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.project.highload.user.domain.User;
 import ru.project.highload.user.repository.UserRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,5 +21,9 @@ public class UserService {
 
     public User findById(UUID id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found by id " + id));
+    }
+
+    public List<User> search(String firstName, String lastName) {
+        return repository.searchUsers(firstName, lastName);
     }
 }

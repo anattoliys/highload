@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "efc4acda-f2c2-484b-8a1a-20272ffb0812",
+    "_postman_id": "45be8a8c-7f93-43de-ae37-1068666419b3",
     "name": "highload",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "16462575"
@@ -48,7 +48,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"id\": \"5bfa1bb1-aaef-4cf0-9cf8-db14e19abbd5\",\r\n  \"password\": \"12345678\"\r\n}",
+          "raw": "{\r\n  \"id\": \"ccffe6d6-885e-486d-b86a-4a31764a11d9\",\r\n  \"password\": \"12345678\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -80,7 +80,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1YmZhMWJiMS1hYWVmLTRjZjAtOWNmOC1kYjE0ZTE5YWJiZDUiLCJpYXQiOjE3Njg4MzYyOTgsImV4cCI6MTc2ODkyMjY5OH0.QWmjbKPcZ-T1A08ZZ89rJR4vnqBcr2Rus3PiMhRDkOQZ7glfSHgQ-_8utdlUSm3zLEM6YJIPozSfz6mHPJPuTw",
+              "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2ZmZTZkNi04ODVlLTQ4NmQtYjg2YS00YTMxNzY0YTExZDkiLCJpYXQiOjE3Njg4Mzk2OTAsImV4cCI6MTc2ODkyNjA5MH0.AhrIofbivoYYlasHhcZULQAjPRvels1E5XTSA1a0K1iTZVBk1Enov1LewtDai5LV15XZhJzfMG96Bcn_MYaAaA",
               "type": "string"
             }
           ]
@@ -97,7 +97,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8081/user/get/5bfa1bb1-aaef-4cf0-9cf8-db14e19abbd5",
+          "raw": "http://localhost:8081/user/get/ccffe6d6-885e-486d-b86a-4a31764a11d9",
           "protocol": "http",
           "host": [
             "localhost"
@@ -106,7 +106,52 @@
           "path": [
             "user",
             "get",
-            "5bfa1bb1-aaef-4cf0-9cf8-db14e19abbd5"
+            "ccffe6d6-885e-486d-b86a-4a31764a11d9"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/user/search?first_name=ана&last_name=бел",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "user",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "first_name",
+              "value": "ана"
+            },
+            {
+              "key": "last_name",
+              "value": "бел"
+            }
           ]
         }
       },
