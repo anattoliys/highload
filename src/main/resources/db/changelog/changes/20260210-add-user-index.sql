@@ -1,2 +1,1 @@
--- CREATE INDEX idx_users_first_name ON users (LOWER(first_name) text_pattern_ops);
--- CREATE INDEX idx_users_second_name ON users (LOWER(second_name) text_pattern_ops);
+-- CREATE INDEX idx_users_names ON users (LOWER(first_name) text_pattern_ops, LOWER(second_name) text_pattern_ops, id ASC);
