@@ -120,7 +120,17 @@
 - ![highload-grafana](./img/highload-grafana.png)
 - Остановил мастер узел
 - Patroni сам выбрал свежий слейв и промоутил его до мастера
-  - Без patroni
+  ```
+  docker exec -it -e PATRONI_ETCD3_HOSTS=etcd:2379 highload-slave-1 patronictl -c //home/postgres/patroni.yml list
+  
+  + Cluster: highload-cluster (7609054903417151516) ----------+----+-----------+
+  | Member           | Host             | Role    | State     | TL | Lag in MB |
+  +------------------+------------------+---------+-----------+----+-----------+
+  | highload-slave-1 | postgres-slave-1 | Leader  | running   |  2 |           |
+  | highload-slave-2 | postgres-slave-2 | Replica | streaming |  2 |         0 |
+  +------------------+------------------+---------+-----------+----+-----------+
+  ```
+  - Без patroni:
   - На каждом слейве выполнить запрос. Свежий слейв будет тот, у которого LSN больше
   ```
   SELECT 
@@ -134,7 +144,7 @@
   ```
   - На втором слейве обновляем конфиг primary_conninfo в postgresql.conf
   ```
-  primary_conninfo = 'host=highload-slave-1 port=5432 user=replicator password=pass`
+  primary_conninfo = 'host=highload-slave-1 port=5432 user=replicator password=pass'
   ```
   - Перезапускаем второй слейв
 - Проверил, что нет потерь транзакций
