@@ -1,22 +1,63 @@
 server:
   port: 8081
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: "%t %m %U %s %Dms"
 spring:
   application:
     name: highload
   datasource:
-    url: jdbc:postgresql://localhost:5432/highload-db
-    username: highload-user
-    password: 12345678
-    driver-class-name: org.postgresql.Driver
+    master:
+      jdbc-url: jdbc:postgresql://postgres-master:5432,postgres-slave-1:5432,postgres-slave-2:5432/postgres?targetServerType=primary
+      username: highload-user
+      password: 12345678
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        pool-name: MasterPool
+        maximum-pool-size: 20
+        connection-timeout: 5000
+        keepalive-time: 30000
+    slave1:
+      jdbc-url: jdbc:postgresql://postgres-slave-1:5432/postgres
+      username: highload-user
+      password: 12345678
+      hikari:
+        pool-name: Slave1Pool
+        maximum-pool-size: 20
+        read-only: true
+    slave2:
+      jdbc-url: jdbc:postgresql://postgres-slave-2:5432/postgres
+      username: highload-user
+      password: 12345678
+      hikari:
+        pool-name: Slave2Pool
+        maximum-pool-size: 20
+        read-only: true
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
+    url: jdbc:postgresql://postgres-master:5432/postgres?targetServerType=primary
+    user: highload-user
+    password: 12345678
 
 jwt:
   secret: 9a4f2c8d3b1e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e
   expiration-time: 86400000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 logging:
   level:
     org.springframework.jdbc.core.JdbcTemplate: DEBUG
     org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+    org.apache.catalina.valves.AccessLogValve: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
