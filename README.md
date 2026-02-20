@@ -134,7 +134,7 @@
   ```
   - На втором слейве обновляем конфиг primary_conninfo в postgresql.conf
   ```
-  primary_conninfo = 'host=highload-slave-1 port=5432 user=replicator password=pass`
+  primary_conninfo = 'host=highload-slave-1 port=5432 user=replicator password=pass'
   ```
   - Перезапускаем второй слейв
 - Проверил, что нет потерь транзакций
