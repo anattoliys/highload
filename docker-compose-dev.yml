@@ -1,103 +1,115 @@
 services:
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.12
-    container_name: highload-etcd
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
-    networks:
-      - highload
-  postgres-master:
-    image: ghcr.io/zalando/spilo-17:4.0-p3
+  postgres:
+    image: postgres:17-alpine
     container_name: highload-master
-    user: postgres
     environment:
-      PATRONI_NAME: highload-master
-      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-master:5432
-      PATRONI_ETCD3_HOSTS: etcd:2379
-      PATRONI_TAGS_FAILOVER_PRIORITY: 100
-      ETCDCTL_API: 3
-      POSTGRES_DB: postgres
+      POSTGRES_DB: highload-db
       POSTGRES_USER: highload-user
       POSTGRES_PASSWORD: 12345678
-      PGPASSWORD: 12345678
     ports:
       - "5432:5432"
-    volumes:
-      - $PWD/volumes/postgres-master:/home/postgres/pgdata
-      - ./patroni.yml:/home/postgres/patroni.yml:ro
-    command: ["python3", "-m", "patroni", "/home/postgres/patroni.yml"]
-    depends_on:
-      - etcd
     networks:
       - highload
 
-  postgres-slave-1:
-    image: ghcr.io/zalando/spilo-17:4.0-p3
-    container_name: highload-slave-1
-    user: postgres
-    depends_on:
-      - etcd
-    environment:
-      PATRONI_NAME: highload-slave-1
-      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-slave-1:5432
-      PATRONI_ETCD3_HOSTS: etcd:2379
-      PATRONI_TAGS_FAILOVER_PRIORITY: 1
-      ETCDCTL_API: 3
-      POSTGRES_PASSWORD: "12345678"
-    volumes:
-      - $PWD/volumes/postgres-slave-1:/home/postgres/pgdata
-      - ./patroni.yml:/home/postgres/patroni.yml:ro
-    command: ["sh", "-c", "sleep 7 && python3 -m patroni /home/postgres/patroni.yml"]
-    ports:
-      - "15432:5432"
-    networks:
-      - highload
-
-  postgres-slave-2:
-    image: ghcr.io/zalando/spilo-17:4.0-p3
-    container_name: highload-slave-2
-    user: postgres
-    depends_on:
-      - etcd
-    environment:
-      PATRONI_NAME: highload-slave-2
-      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-slave-2:5432
-      PATRONI_ETCD3_HOSTS: etcd:2379
-      PATRONI_TAGS_FAILOVER_PRIORITY: 1
-      ETCDCTL_API: 3
-      POSTGRES_PASSWORD: "12345678"
-    volumes:
-      - $PWD/volumes/postgres-slave-2:/home/postgres/pgdata
-      - ./patroni.yml:/home/postgres/patroni.yml:ro
-    command: ["sh", "-c", "sleep 10 && python3 -m patroni /home/postgres/patroni.yml"]
-    ports:
-      - "25432:5432"
-    networks:
-      - highload
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - highload
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    networks:
-      - highload
-    depends_on:
-      - prometheus
+#  etcd:
+#    image: quay.io/coreos/etcd:v3.5.12
+#    container_name: highload-etcd
+#    environment:
+#      - ALLOW_NONE_AUTHENTICATION=yes
+#      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+#      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+#    networks:
+#      - highload
+#  postgres-master:
+#    image: ghcr.io/zalando/spilo-17:4.0-p3
+#    container_name: highload-master
+#    user: postgres
+#    environment:
+#      PATRONI_NAME: highload-master
+#      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-master:5432
+#      PATRONI_ETCD3_HOSTS: etcd:2379
+#      PATRONI_TAGS_FAILOVER_PRIORITY: 100
+#      ETCDCTL_API: 3
+#      POSTGRES_DB: postgres
+#      POSTGRES_USER: highload-user
+#      POSTGRES_PASSWORD: 12345678
+#      PGPASSWORD: 12345678
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - $PWD/volumes/postgres-master:/home/postgres/pgdata
+#      - ./patroni.yml:/home/postgres/patroni.yml:ro
+#    command: ["python3", "-m", "patroni", "/home/postgres/patroni.yml"]
+#    depends_on:
+#      - etcd
+#    networks:
+#      - highload
+#
+#  postgres-slave-1:
+#    image: ghcr.io/zalando/spilo-17:4.0-p3
+#    container_name: highload-slave-1
+#    user: postgres
+#    depends_on:
+#      - etcd
+#    environment:
+#      PATRONI_NAME: highload-slave-1
+#      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-slave-1:5432
+#      PATRONI_ETCD3_HOSTS: etcd:2379
+#      PATRONI_TAGS_FAILOVER_PRIORITY: 1
+#      ETCDCTL_API: 3
+#      POSTGRES_PASSWORD: "12345678"
+#    volumes:
+#      - $PWD/volumes/postgres-slave-1:/home/postgres/pgdata
+#      - ./patroni.yml:/home/postgres/patroni.yml:ro
+#    command: ["sh", "-c", "sleep 7 && python3 -m patroni /home/postgres/patroni.yml"]
+#    ports:
+#      - "15432:5432"
+#    networks:
+#      - highload
+#
+#  postgres-slave-2:
+#    image: ghcr.io/zalando/spilo-17:4.0-p3
+#    container_name: highload-slave-2
+#    user: postgres
+#    depends_on:
+#      - etcd
+#    environment:
+#      PATRONI_NAME: highload-slave-2
+#      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-slave-2:5432
+#      PATRONI_ETCD3_HOSTS: etcd:2379
+#      PATRONI_TAGS_FAILOVER_PRIORITY: 1
+#      ETCDCTL_API: 3
+#      POSTGRES_PASSWORD: "12345678"
+#    volumes:
+#      - $PWD/volumes/postgres-slave-2:/home/postgres/pgdata
+#      - ./patroni.yml:/home/postgres/patroni.yml:ro
+#    command: ["sh", "-c", "sleep 10 && python3 -m patroni /home/postgres/patroni.yml"]
+#    ports:
+#      - "25432:5432"
+#    networks:
+#      - highload
+#
+#  prometheus:
+#    image: prom/prometheus:latest
+#    container_name: prometheus
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#    ports:
+#      - "9090:9090"
+#    networks:
+#      - highload
+#
+#  grafana:
+#    image: grafana/grafana:latest
+#    container_name: grafana
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      - GF_SECURITY_ADMIN_PASSWORD=admin
+#    networks:
+#      - highload
+#    depends_on:
+#      - prometheus
 
 networks:
   highload:

@@ -7,5 +7,6 @@
 
     <include file="db/changelog/changes/20260117-init.sql" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/20260210-add-user-index.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/20260224-add-friends-table.sql" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

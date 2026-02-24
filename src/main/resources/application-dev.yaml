@@ -4,32 +4,36 @@ spring:
   application:
     name: highload
   datasource:
-    master:
-      jdbc-url: jdbc:postgresql://localhost:5432/highload-db
-      username: highload-user
-      password: 12345678
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        pool-name: MasterPool
-        maximum-pool-size: 10
-        connection-timeout: 30000
-        keepalive-time: 30000
-    slave1:
-      jdbc-url: jdbc:postgresql://localhost:15432/highload-db
-      username: highload-user
-      password: 12345678
-      hikari:
-        pool-name: Slave1Pool
-        maximum-pool-size: 20
-        read-only: true
-    slave2:
-      jdbc-url: jdbc:postgresql://localhost:25432/highload-db
-      username: highload-user
-      password: 12345678
-      hikari:
-        pool-name: Slave2Pool
-        maximum-pool-size: 20
-        read-only: true
+    url: jdbc:postgresql://localhost:5432/highload-db
+    username: highload-user
+    password: 12345678
+    driver-class-name: org.postgresql.Driver
+#    master:
+#      jdbc-url: jdbc:postgresql://localhost:5432/highload-db
+#      username: highload-user
+#      password: 12345678
+#      driver-class-name: org.postgresql.Driver
+#      hikari:
+#        pool-name: MasterPool
+#        maximum-pool-size: 10
+#        connection-timeout: 30000
+#        keepalive-time: 30000
+#    slave1:
+#      jdbc-url: jdbc:postgresql://localhost:15432/highload-db
+#      username: highload-user
+#      password: 12345678
+#      hikari:
+#        pool-name: Slave1Pool
+#        maximum-pool-size: 20
+#        read-only: true
+#    slave2:
+#      jdbc-url: jdbc:postgresql://localhost:25432/highload-db
+#      username: highload-user
+#      password: 12345678
+#      hikari:
+#        pool-name: Slave2Pool
+#        maximum-pool-size: 20
+#        read-only: true
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
