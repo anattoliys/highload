@@ -6,6 +6,8 @@ import ru.project.highload.openapi.dto.PostCreatePostRequest;
 import ru.project.highload.openapi.dto.PostUpdatePutRequest;
 import ru.project.highload.post.domain.Post;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface PostMapper {
 
@@ -22,4 +24,6 @@ public interface PostMapper {
 
     @Mapping(target = "authorUserId", expression = "java(post.getAuthorId().toString())")
     ru.project.highload.openapi.dto.Post toDto(Post post);
+
+    List<ru.project.highload.openapi.dto.Post> toDtoList(List<Post> post);
 }

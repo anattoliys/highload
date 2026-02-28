@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.project.highload.post.domain.Post;
 import ru.project.highload.post.repository.PostRepository;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,5 +39,9 @@ public class PostService {
 
     public Post getById(UUID id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
+    }
+
+    public List<Post> getFeeds(UUID userId, BigDecimal offset, BigDecimal limit) {
+        return repository.findFeeds(userId, offset, limit);
     }
 }

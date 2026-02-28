@@ -46,6 +46,6 @@ public class PostController implements PostApi {
 
     @Override
     public ResponseEntity<List<Post>> postFeedGet(BigDecimal offset, BigDecimal limit) {
-        return null;
+        return ResponseEntity.ok(mapper.toDtoList(service.getFeeds(SecurityUtils.getCurrentUserId(), offset, limit)));
     }
 }
