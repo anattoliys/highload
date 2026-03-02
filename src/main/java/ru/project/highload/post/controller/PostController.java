@@ -1,7 +1,11 @@
 package ru.project.highload.post.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.project.highload.openapi.api.PostApi;
 import ru.project.highload.openapi.dto.Post;
@@ -47,5 +51,15 @@ public class PostController implements PostApi {
     @Override
     public ResponseEntity<List<Post>> postFeedGet(BigDecimal offset, BigDecimal limit) {
         return ResponseEntity.ok(mapper.toDtoList(service.getFeeds(SecurityUtils.getCurrentUserId(), offset, limit)));
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/post/rebuild",
+            produces = {"application/json"}
+    )
+    public ResponseEntity<Void> rebuildUserFeed(@Parameter(name = "userId", in = ParameterIn.QUERY) UUID userId) {
+        service.rebuildUserFeed(userId);
+        return ResponseEntity.ok().build();
     }
 }

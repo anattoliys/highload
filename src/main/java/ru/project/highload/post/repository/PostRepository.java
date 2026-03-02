@@ -71,19 +71,31 @@ public class PostRepository {
 
     public List<Post> findFeeds(UUID userId, BigDecimal offset, BigDecimal limit) {
         return jdbcClient.sql("""
-                    SELECT p.id, p.author_id, p.text, p.created_at, p.updated_at
-                    FROM posts p
-                    INNER JOIN friends f ON p.author_id = f.friend_id
-                    WHERE f.user_id = :userId
-                      AND f.status = 'accepted'
-                      AND p.is_deleted = FALSE
-                    ORDER BY p.created_at DESC
-                    LIMIT :limit OFFSET :offset
-                    """)
+                        SELECT p.id, p.author_id, p.text, p.created_at, p.updated_at
+                        FROM posts p
+                        INNER JOIN friends f ON p.author_id = f.friend_id
+                        WHERE f.user_id = :userId
+                          AND f.status = 'accepted'
+                          AND p.is_deleted = FALSE
+                        ORDER BY p.created_at DESC
+                        LIMIT :limit OFFSET :offset
+                        """)
                 .param("userId", userId)
                 .param("offset", offset)
                 .param("limit", limit)
                 .query(Post.class)
+                .list();
+    }
+
+    public List<UUID> findAcceptedFriendIds(UUID authorId) {
+        return jdbcClient.sql("""
+                        SELECT user_id 
+                        FROM friends 
+                        WHERE friend_id = :authorId 
+                          AND status = 'accepted'
+                        """)
+                .param("authorId", authorId)
+                .query(UUID.class)
                 .list();
     }
 }

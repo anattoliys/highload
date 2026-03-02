@@ -6,8 +6,8 @@ main_user_id UUID;
     j INTEGER;
 BEGIN
     -- создаем 1 юзера
-    INSERT INTO users (first_name, second_name, birthdate, sex, biography, city, password)
-    VALUES ('Валера', 'Первый', '1990-01-01', 'MALE', 'У меня много друзей', 'Москва', '$2a$10$PP2XG1cqUQGvgX8SUOwcQeNZ0jO5NxkV2JZGarPIncjqlDfR3u2ZW')
+    INSERT INTO users (id, first_name, second_name, birthdate, sex, biography, city, password)
+    VALUES ('1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6', 'Валера', 'Первый', '1990-01-01', 'MALE', 'У меня много друзей', 'Москва', '$2a$10$PP2XG1cqUQGvgX8SUOwcQeNZ0jO5NxkV2JZGarPIncjqlDfR3u2ZW')
     RETURNING id INTO main_user_id;
 
     -- создаем 50 друзей

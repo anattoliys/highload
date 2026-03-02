@@ -1,157 +1,450 @@
 {
   "info": {
-    "_postman_id": "45be8a8c-7f93-43de-ae37-1068666419b3",
+    "_postman_id": "a920ca18-7b15-4c17-ac6c-f67a6d4caa3d",
     "name": "highload",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "16462575"
   },
   "item": [
     {
-      "name": "create user",
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"first_name\": \"Иван\",\r\n  \"second_name\": \"Иванов\",\r\n  \"birthdate\": \"2001-02-01\",\r\n  \"sex\": \"MALE\",\r\n  \"biography\": \"Играю на гитаре\",\r\n  \"city\": \"Москва\",\r\n  \"password\": \"12345678\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8081/user/register",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8081",
-          "path": [
-            "user",
-            "register"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "login",
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"id\": \"ccffe6d6-885e-486d-b86a-4a31764a11d9\",\r\n  \"password\": \"12345678\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8081/login",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8081",
-          "path": [
-            "login"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "find user by id",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjY2ZmZTZkNi04ODVlLTQ4NmQtYjg2YS00YTMxNzY0YTExZDkiLCJpYXQiOjE3Njg4Mzk2OTAsImV4cCI6MTc2ODkyNjA5MH0.AhrIofbivoYYlasHhcZULQAjPRvels1E5XTSA1a0K1iTZVBk1Enov1LewtDai5LV15XZhJzfMG96Bcn_MYaAaA",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8081/user/get/ccffe6d6-885e-486d-b86a-4a31764a11d9",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8081",
-          "path": [
-            "user",
-            "get",
-            "ccffe6d6-885e-486d-b86a-4a31764a11d9"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "search",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8081/user/search?first_name=ана&last_name=бел",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8081",
-          "path": [
-            "user",
-            "search"
-          ],
-          "query": [
-            {
-              "key": "first_name",
-              "value": "ана"
+      "name": "user",
+      "item": [
+        {
+          "name": "create user",
+          "request": {
+            "auth": {
+              "type": "noauth"
             },
-            {
-              "key": "last_name",
-              "value": "бел"
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"first_name\": \"Иван\",\r\n  \"second_name\": \"Иванов\",\r\n  \"birthdate\": \"2001-02-01\",\r\n  \"sex\": \"MALE\",\r\n  \"biography\": \"Играю на гитаре\",\r\n  \"city\": \"Москва\",\r\n  \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/user/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "user",
+                "register"
+              ]
             }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": \"0359d502-08ba-47b7-ba10-1df5fad9027c\",\r\n  \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/user/search?first_name=ана&last_name=бел",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "user",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "first_name",
+                  "value": "ана"
+                },
+                {
+                  "key": "last_name",
+                  "value": "бел"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "find user by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmMDlmNjhjNC05NGE1LTRjZTAtYjVlZS0wN2JhYWU2Zjg3YzMiLCJpYXQiOjE3NzE0Mzc1NjgsImV4cCI6MTc3MTUyMzk2OH0.PbOF8qAEesNZ5zDKaRHXvnIFOYG29xtz8cj2sDH9spAOj6_ViXuw704gXziSHABjX5Lv-MBNHmjzyejcwAMy6w",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/user/get/678a3381-83c2-4f51-9edc-ad9d360552d9",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "user",
+                "get",
+                "678a3381-83c2-4f51-9edc-ad9d360552d9"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "friend",
+      "item": [
+        {
+          "name": "add",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJlYzE2ZDBiNC1lZTFmLTQ4MTUtYTA2Zi1kNzkwMjAwNmM0YmEiLCJpYXQiOjE3NzE5NjI5NzAsImV4cCI6MTc3MjA0OTM3MH0.CU2HpKRXHYWn_n8QR09dhxLAQYZH94uP0qJgTwSZb4OzqsGeVaNjp-9aFzxHhb8KVsBjqYbQhGTc74gizTo9ug",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/friend/set/8b6dcefb-0574-431c-84ea-e6820b6e46e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "friend",
+                "set",
+                "8b6dcefb-0574-431c-84ea-e6820b6e46e2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJlYzE2ZDBiNC1lZTFmLTQ4MTUtYTA2Zi1kNzkwMjAwNmM0YmEiLCJpYXQiOjE3NzE5NjI5NzAsImV4cCI6MTc3MjA0OTM3MH0.CU2HpKRXHYWn_n8QR09dhxLAQYZH94uP0qJgTwSZb4OzqsGeVaNjp-9aFzxHhb8KVsBjqYbQhGTc74gizTo9ug",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/friend/delete/8b6dcefb-0574-431c-84ea-e6820b6e46e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "friend",
+                "delete",
+                "8b6dcefb-0574-431c-84ea-e6820b6e46e2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "post",
+      "item": [
+        {
+          "name": "create post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMzU5ZDUwMi0wOGJhLTQ3YjctYmExMC0xZGY1ZmFkOTAyN2MiLCJpYXQiOjE3NzI2MzY4NTIsImV4cCI6MTc3MjcyMzI1Mn0.pHQeLhBsMIjRyM2skQLkG9w7SIFMMg_SikQe_U_FYkA4TKmNFpwyyH99yNSU8NibgFqB6dO6aUQlvXQYvqrSjg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"text\": \"Текст поста\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/post/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMzU5ZDUwMi0wOGJhLTQ3YjctYmExMC0xZGY1ZmFkOTAyN2MiLCJpYXQiOjE3NzI2MzY4NTIsImV4cCI6MTc3MjcyMzI1Mn0.pHQeLhBsMIjRyM2skQLkG9w7SIFMMg_SikQe_U_FYkA4TKmNFpwyyH99yNSU8NibgFqB6dO6aUQlvXQYvqrSjg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"eb151425-a282-49a4-98fa-572f002f6e83\",\r\n    \"text\": \"Обновленный текст поста\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/post/update",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMzU5ZDUwMi0wOGJhLTQ3YjctYmExMC0xZGY1ZmFkOTAyN2MiLCJpYXQiOjE3NzI2MzY4NTIsImV4cCI6MTc3MjcyMzI1Mn0.pHQeLhBsMIjRyM2skQLkG9w7SIFMMg_SikQe_U_FYkA4TKmNFpwyyH99yNSU8NibgFqB6dO6aUQlvXQYvqrSjg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/post/delete/eb151425-a282-49a4-98fa-572f002f6e83",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "delete",
+                "eb151425-a282-49a4-98fa-572f002f6e83"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/post/get/0e43dcea-c313-4778-a5d1-38f75da140c0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "get",
+                "0e43dcea-c313-4778-a5d1-38f75da140c0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get feeds",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzI2MzY2MDUsImV4cCI6MTc3MjcyMzAwNX0.A_oHMRj9IWFSIAmr2BI9CNVEOTZkPzrfod6agHgpNmx5dPJchaQi8rrnSRfZC2nwMML3-7R1UNoxXb4MHxz7BQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/post/feed",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "feed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "rebuild cache",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMzdjNzU2OS02NTgxLTRjN2YtYjQzYy0zMjk3MGZhNDY3N2QiLCJpYXQiOjE3NzI2MjQ3NDYsImV4cCI6MTc3MjcxMTE0Nn0.CLjqTvCHLdQrjtn17zsc34Y4oN_8ePcNPJxZZgoIR0DkjyODHLsVkiZHo8_MxpqysTD2tiunaG55o-mL7egYvA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/post/rebuild?userId=1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "post",
+                "rebuild"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "prometeus",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/actuator/prometheus",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "actuator",
+            "prometheus"
           ]
         }
       },
