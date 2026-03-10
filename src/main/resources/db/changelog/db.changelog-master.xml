@@ -10,5 +10,6 @@
     <include file="db/changelog/changes/20260224-add-friends-table.sql" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/20260226-add-posts-table.sql" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/20260228-insert-friends-and-posts.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/20260317-add-dialog-table.sql" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

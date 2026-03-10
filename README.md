@@ -8,6 +8,120 @@
   - таблицы в postgres будут созданы и заполнены при запуске приложения автоматически
 - Postman-коллекции расположена по пути `postman/highload.postman_collection.json`
 
+## Шардирование
+
+- Поднимаем контейнеры
+  ```
+  docker compose -f .\docker-compose-sharding-dev.yml up --scale worker=2 -d
+  ```
+- Подключаемся к координатору
+  ```
+  docker exec -it highload_master psql -U postgres
+  ```
+- Создаем таблицу
+  ```
+  CREATE TABLE test (
+  id bigint NOT NULL PRIMARY KEY,
+  data text NOT NULL
+  );
+  ```
+- Регистрируем воркеры
+  ```
+  SELECT * FROM citus_add_node('highload-worker-1', 5432);
+  SELECT * FROM citus_add_node('highload-worker-2', 5432);
+  ```
+- Создаем распределенную (шардированную) таблицу
+  ```
+  SELECT create_distributed_table('test', 'id');
+  ```
+- Наполняем данными
+  ```
+  insert into test(id, data)
+  select
+  i,
+  md5(random()::text)
+  from generate_series(1, 1000000) as i;
+  ```
+- Посмотрим план запроса, select теперь распределенный и пойдет на все шарды
+  ```
+  explain select * from test limit 10;
+  ```
+- Добавим дополнительные шарды
+  ```
+  docker compose -f .\docker-compose-sharding-dev.yml up --scale worker=5 -d
+  ```
+- Подключаемся к координатору
+  ```
+  docker exec -it highload_master psql -U postgres
+  ```
+- Регистрируем воркеры
+  ```
+  SELECT * FROM citus_add_node('highload-worker-3', 5432);
+  SELECT * FROM citus_add_node('highload-worker-4', 5432);
+  SELECT * FROM citus_add_node('highload-worker-5', 5432);
+  ```
+- Проверим, видит ли координатор новые шарды
+  ```
+  SELECT master_get_active_worker_nodes();
+  ```
+- Посмотрим на каких узлах лежат сейчас данные
+  ```
+  SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+  ```
+- Установим wal_level = logical чтобы узлы перенесли данные
+  ```
+  alter system set wal_level = logical; SELECT run_command_on_workers('alter system set wal_level = logical');
+  ```
+- Перезапускаем все узлы в кластере, чтобы применился wal_level
+  ```
+  docker compose -f .\docker-compose-sharding-dev.yml restart
+  ```
+- Убедимся, что wal_level изменился
+  ```
+  docker exec -it highload-worker-1 psql -U postgres
+  
+  show wal_level;
+  ```
+- Запустим ребалансировку
+  ```
+  docker exec -it highload_master psql -U postgres
+  
+  SELECT citus_rebalance_start();
+  ```
+- Проверим статус ребалансировки
+  ```
+  SELECT * FROM citus_rebalance_status();
+  ```
+- Проверяем, что данные равномерно распределились по шардам
+  ```
+  SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+  ```
+
+### to do
+
+- дз
+  - осуществлять настройку шардирования с Citus
+  - Реализовать функционал:
+    - Отправка сообщения пользователю (метод /dialog/{user_id}/send из спецификации)
+    - Получение диалога между двумя пользователями (метод /dialog/{user_id}/list из спецификации)
+  - Требования
+    - Обеспечить горизонтальное масштабирование хранилищ на запись с помощью шардинга
+    - Предусмотреть:
+      - Возможность решардинга
+      - (опционально) “Эффект Леди Гаги” (один пользователь пишет сильно больше среднего)
+      - Наиболее эффективную схему
+  - Критерии оценки:
+    - (опционально) Верно выбран ключ шардирования с учетом "эффекта Леди Гаги"
+    - В отчете описан процесс решардинга без даунтайма
+- из видео
+  - продумать модель хранения данных, какие будут таблицы, как данные будут распределяться по таблицам и какой ключ шардирования выбрать
+  - есть 2 варианта по сложности: диалоги (2 юзера) и групповые чаты
+  - просматривают диалог с последних не прочитанных, затем читаются по новизне. это надо учитывать в select запросах и при выборе ключа шардирования
+  - написать отчет
+    - создана такая-то таблица с такими то колонки
+    - такие-то запросы на вставку и выборку данных, чтобы соответствовать перечисленным в задании кейсам
+    - для того чтобы они работали эффективно в качестве ключа распределения данных я выбрал то-то то-то
+
 ## Кеширование
 
 - Добавил методы по добавлению/удалению друга
