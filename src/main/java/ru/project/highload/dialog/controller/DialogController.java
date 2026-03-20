@@ -23,7 +23,7 @@ public class DialogController implements DialogApi {
 
     @Override
     public ResponseEntity<List<DialogMessage>> dialogUserIdListGet(String userId) {
-        List<Message> messages = service.findMessages(SecurityUtils.getCurrentUserId(), UUID.fromString(userId));
+        List<Message> messages = service.findDialog(SecurityUtils.getCurrentUserId(), UUID.fromString(userId));
         return ResponseEntity.ok(mapper.toDto(messages));
     }
 

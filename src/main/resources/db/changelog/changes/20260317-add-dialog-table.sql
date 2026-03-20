@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS dialog_messages (
-    id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id           UUID DEFAULT uuid_generate_v4(),
+    dialog_id    UUID NOT NULL,
     sender_id    UUID NOT NULL,
     recipient_id UUID NOT NULL,
     message_text TEXT NOT NULL,
+    is_read      BOOLEAN DEFAULT FALSE,
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP
+    updated_at   TIMESTAMP,
+    PRIMARY KEY (dialog_id, id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_dialog_participants
-ON dialog_messages (sender_id, recipient_id, created_at DESC);

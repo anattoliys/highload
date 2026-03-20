@@ -14,28 +14,30 @@ public class DialogRepository {
 
     private final JdbcClient jdbcClient;
 
-    public List<Message> findAllMessagesBetween(UUID firstUser, UUID secondUser) {
+    public List<Message> findAllByDialogId(UUID currentUser, UUID dialogId) {
         return jdbcClient.sql("""
-                        SELECT sender_id, recipient_id, message_text
+                        SELECT sender_id, recipient_id, message_text, is_read, created_at
                         FROM dialog_messages
-                        WHERE (sender_id = :first AND recipient_id = :second)
-                           OR (sender_id = :second AND recipient_id = :first)
-                        ORDER BY created_at ASC
+                        WHERE dialog_id = :dialogId
+                        ORDER BY
+                            (recipient_id = :current AND is_read = FALSE) DESC,
+                            created_at DESC
                         """)
-                .param("first", firstUser)
-                .param("second", secondUser)
+                .param("current", currentUser)
+                .param("dialogId", dialogId)
                 .query(Message.class)
                 .list();
     }
 
-    public void saveMessage(UUID from, UUID to, String text) {
+    public void saveMessage(UUID from, UUID to, String text, UUID dialogId) {
         jdbcClient.sql("""
-                        INSERT INTO dialog_messages (sender_id, recipient_id, message_text)
-                        VALUES (:sender_id, :recipient_id, :message_text)
+                        INSERT INTO dialog_messages (sender_id, recipient_id, message_text, dialog_id)
+                        VALUES (:senderId, :recipientId, :messageText, :dialogId)
                         """)
-                .param("sender_id", from)
-                .param("recipient_id", to)
-                .param("message_text", text)
+                .param("senderId", from)
+                .param("recipientId", to)
+                .param("messageText", text)
+                .param("dialogId", dialogId)
                 .update();
     }
 }
