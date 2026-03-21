@@ -4,8 +4,8 @@ spring:
   application:
     name: highload
   datasource:
-    url: jdbc:postgresql://localhost:5432/highload-db
-    username: highload-user
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
   data:

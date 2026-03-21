@@ -1,12 +1,109 @@
 # highload
 
-## Локальный запуск приложения
+## Шардирование
 
-- выполнить команду `docker compose up -d`
-  - будет поднята бд postgres
-  - сбилдится и запустится spring приложение
-  - таблицы в postgres будут созданы и заполнены при запуске приложения автоматически
-- Postman-коллекции расположена по пути `postman/highload.postman_collection.json`
+- Создана таблица `dialog_messages(id, dialog_id, sender_id, recipient_id, message_text, is_read, created_at, updated_at)`. Поле `dialog_id` является уникальным хешем от пары UUID пользователей, он всегда будет одинаковый для любого направления переписки (user1 -> user2 или user2 -> user1)
+- Реализованы api:
+  - POST `/dialog/{user_id}/send`: Сохранение нового сообщения
+  - GET `/dialog/{user_id}/list`: Получение истории переписки между двумя пользователями
+- Данные в запросе `/dialog/{user_id}/list` сортируются по условию: сначала не прочитанные сообщения для текущего пользователя, затем остальные сообщения по новизне
+- В качестве ключа шардирование выбрано поле `dialog_id`. При вызове `/dialog/{user_id}/send` создается уникальный UUID на основе id двух пользователей. Все сообщения между двумя пользователями всегда будут сохраняться на одном шарде и при вызове `/dialog/{user_id}/list` Citus будет направлять запросы только на один шард
+- Обновлена postman-коллекции `postman/highload.postman_collection.json`
+
+### Шардирование. Практика
+
+- Поднимаем контейнеры
+  ```
+  docker compose -f .\docker-compose-sharding.yml -p citus up --scale worker=2 -d
+  ```
+- Подключаемся к координатору
+  ```
+  docker exec -it citus-master psql -U postgres
+  ```
+- Регистрируем воркеры
+  ```
+  SELECT * FROM citus_add_node('citus-worker-1', 5432);
+  SELECT * FROM citus_add_node('citus-worker-2', 5432);
+  ```
+- Создаем распределенную (шардированную) таблицу
+  ```
+  SELECT create_distributed_table('dialog_messages', 'dialog_id');
+  ```
+- Посмотрим план запроса, select теперь распределенный и пойдет на все шарды
+  ```
+  explain select * from dialog_messages limit 10;
+  ```
+- Убедимся, что запрос на получение диалога между двумя пользователями ходит всегда на 1 шард
+  ```
+  explain SELECT sender_id, recipient_id, message_text, is_read, created_at
+  FROM dialog_messages
+  WHERE dialog_id = 'b448694f-80bc-3519-bc0f-53ddbb355a3b'
+  ORDER BY
+      (recipient_id = '046e74fd-ca67-4311-b081-ece8b2fd292a' AND is_read = FALSE) DESC,
+      created_at DESC;
+  ```
+  ```
+  -----------------------------------------------------------------------------------------------------------------------------------
+  Custom Scan (Citus Adaptive)  (cost=0.00..0.00 rows=0 width=0)
+  Task Count: 1
+  Tasks Shown: All
+  ->  Task
+  Node: host=citus-worker-1 port=5432 dbname=postgres
+  ->  Sort  (cost=11.31..11.32 rows=3 width=74)
+  Sort Key: (((recipient_id = '046e74fd-ca67-4311-b081-ece8b2fd292a'::uuid) AND (NOT is_read))) DESC, created_at DESC
+  ->  Bitmap Heap Scan on dialog_messages_102012 dialog_messages  (cost=4.17..11.29 rows=3 width=74)
+  Recheck Cond: (dialog_id = 'b448694f-80bc-3519-bc0f-53ddbb355a3b'::uuid)
+  ->  Bitmap Index Scan on dialog_messages_pkey_102012  (cost=0.00..4.17 rows=3 width=0)
+  Index Cond: (dialog_id = 'b448694f-80bc-3519-bc0f-53ddbb355a3b'::uuid)
+  (11 rows)
+  ```
+- Добавим дополнительные шарды
+  ```
+  docker compose -f .\docker-compose-sharding.yml -p citus up --scale worker=5 -d
+  ```
+- Регистрируем воркеры
+  ```
+  SELECT * FROM citus_add_node('citus-worker-3', 5432);
+  SELECT * FROM citus_add_node('citus-worker-4', 5432);
+  SELECT * FROM citus_add_node('citus-worker-5', 5432);
+  ```
+- Проверим, видит ли координатор новые шарды
+  ```
+  SELECT master_get_active_worker_nodes();
+  ```
+- Посмотрим на каких узлах лежат сейчас данные
+  ```
+  SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+  ```
+- Установим wal_level = logical, чтобы узлы перенесли данные
+  ```
+  alter system set wal_level = logical;
+  SELECT run_command_on_workers('alter system set wal_level = logical');
+  ```
+- Перезапускаем все узлы в кластере, чтобы применился wal_level
+  ```
+  docker compose -f .\docker-compose-sharding.yml -p citus restart
+  ```
+- Убедимся, что wal_level изменился
+  ```
+  docker exec -it citus-worker-1 psql -U postgres
+  
+  show wal_level;
+  ```
+- Запустим ребалансировку на координаторе
+  ```
+  docker exec -it citus-master psql -U postgres
+  
+  SELECT citus_rebalance_start();
+  ```
+- Проверим статус ребалансировки
+  ```
+  SELECT * FROM citus_rebalance_status();
+  ```
+- Проверяем, что данные равномерно распределились по шардам
+  ```
+  SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+  ```
 
 ## Кеширование
 
@@ -191,3 +288,11 @@
   ```
 - Почему индекс именно такой
   - Использовался B-Tree составной индекс. Составной индекс работает быстрее, чем два отдельных, так как выполняет один проход по дереву и сразу получает отфильтрованный результат, в то время как два отдельных индекса требуют раздельного сканирования и последующего слияния. Для операций сравнения, включая поиск по префиксу, B-Tree работает быстрее чем GIN индекс. Так же в индексе используется оператор `text_pattern_ops`, который позволяет ускорить поиск по префиксу в текстовых полях
+
+## Локальный запуск приложения
+
+- выполнить команду `docker compose up -d`
+  - будет поднята бд postgres
+  - сбилдится и запустится spring приложение
+  - таблицы в postgres будут созданы и заполнены при запуске приложения автоматически
+- Postman-коллекции расположена по пути `postman/highload.postman_collection.json`

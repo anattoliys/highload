@@ -51,7 +51,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"id\": \"0359d502-08ba-47b7-ba10-1df5fad9027c\",\r\n  \"password\": \"12345678\"\r\n}",
+              "raw": "{\r\n  \"id\": \"1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6\",\r\n  \"password\": \"12345678\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -423,6 +423,82 @@
                   "key": "userId",
                   "value": "1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6"
                 }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "item": [
+        {
+          "name": "send post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzQxMjIzODcsImV4cCI6MTc3NDIwODc4N30.AjmW2VfMHaSPZJF6r4JNNGs-ZGQRlB5hUtXvRtTUBSP3agyptAKIbShXuWqB0SNVNkAVu2tsJQQIAQAT_FtXQA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"text\": \"text messag 1\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/dialog/0e9118ad-31b8-44a9-82bc-73154c1aa916/send",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "dialog",
+                "0e9118ad-31b8-44a9-82bc-73154c1aa916",
+                "send"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get user list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzQxMjIzODcsImV4cCI6MTc3NDIwODc4N30.AjmW2VfMHaSPZJF6r4JNNGs-ZGQRlB5hUtXvRtTUBSP3agyptAKIbShXuWqB0SNVNkAVu2tsJQQIAQAT_FtXQA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/dialog/0e9118ad-31b8-44a9-82bc-73154c1aa916/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "dialog",
+                "0e9118ad-31b8-44a9-82bc-73154c1aa916",
+                "list"
               ]
             }
           },
