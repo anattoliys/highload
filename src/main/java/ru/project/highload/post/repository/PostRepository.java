@@ -89,9 +89,9 @@ public class PostRepository {
 
     public List<UUID> findAcceptedFriendIds(UUID authorId) {
         return jdbcClient.sql("""
-                        SELECT user_id 
+                        SELECT friend_id 
                         FROM friends 
-                        WHERE friend_id = :authorId 
+                        WHERE user_id = :authorId 
                           AND status = 'accepted'
                         """)
                 .param("authorId", authorId)

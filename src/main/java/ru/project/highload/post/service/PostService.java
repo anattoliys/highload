@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import ru.project.highload.post.config.RabbitConfig;
 import ru.project.highload.post.domain.Post;
+import ru.project.highload.post.domain.PostEvent;
 import ru.project.highload.post.repository.PostRepository;
 
 import java.math.BigDecimal;
@@ -21,6 +24,7 @@ public class PostService {
     private final PostRepository repository;
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+    private final RabbitTemplate rabbitTemplate;
 
     public UUID create(UUID authorId, Post post) {
         if (post.getText() == null || post.getText().isBlank()) {
@@ -31,6 +35,12 @@ public class PostService {
 
         redisTemplate.opsForValue().set("post:" + postId, serialize(dbPost), Duration.ofDays(7));
 
+        PostEvent event = new PostEvent(
+                postId.toString(),
+                post.getText(),
+                authorId.toString()
+        );
+
         List<UUID> friendIds = repository.findAcceptedFriendIds(authorId);
         for (UUID friendId : friendIds) {
             String feedKey = "feed:" + friendId;
@@ -38,7 +48,11 @@ public class PostService {
                 redisTemplate.opsForList().leftPush(feedKey, postId.toString());
                 redisTemplate.opsForList().trim(feedKey, 0, 999);
             }
+
+            String routingKey = "post.feed.posted." + friendId;
+            rabbitTemplate.convertAndSend(RabbitConfig.POST_EXCHANGE, routingKey, event);
         }
+
         return postId;
     }
 

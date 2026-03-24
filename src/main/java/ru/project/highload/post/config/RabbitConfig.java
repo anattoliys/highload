@@ -1,0 +1,31 @@
+package ru.project.highload.post.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.AnonymousQueue;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitConfig {
+
+    public static final String POST_EXCHANGE = "post.updates.exchange";
+
+    @Bean
+    public TopicExchange postExchange() {
+        return new TopicExchange(POST_EXCHANGE);
+    }
+
+    @Bean
+    public Queue instanceQueue() {
+        return new AnonymousQueue();
+    }
+
+    @Bean
+    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+}
