@@ -1,5 +1,54 @@
 # highload
 
+## Очереди и отложенное выполнение
+
+- Был доработан функционал ленты новостей, поддерживающий масштабируемость и доставку постов друзьям автора через RabbitMQ и WebSocket
+- В `PostService` при создании поста выполняется поиск всех id друзей и для каждого генерируется уникальный Routing Key вида `post.feed.posted.{friendId}`
+- Реализован `PostEventListener`, который слушает события из RabbitMQ и транслирует их в WebSocket каналы `/post/feed/posted/{friendId}`. В `PostEventListener` реализован перехват события подписки, как только друг подписывается на свою ленту `/post/feed/posted/{myId}`, приложение на лету создает в RabbitMQ связь между этим ключом и очередью конкретного инстанса сервиса. Это гарантирует, что сообщение получат только целевые пользователи
+- Используется `AnonymousQueue`, уникальная очередь для каждого запущенного инстанса приложения, позволяет запускать любое количество нод сервиса. Если автор и его друг подключены к разным серверам, RabbitMQ сам доставит сообщение на тот узел, где есть активная подписка по соответствующему Routing Key
+- Для обеспечения стабильной работы брокера при росте количества пользователей и постов, масштабирование в RabbitMQ будет происходить следующим образом:
+  - Объединить несколько серверов RabbitMQ в кластер. Это позволяет распределить нагрузку между разными узлами. При нехватке мощности в кластер можно добавить новый сервер
+  - Используется `Topic Exchange`, который позволяет брокеру мгновенно находить нужных получателей по ключу Routing Key, не перебирая все сообщения подряд, что обеспечивает отправку только целевым пользователям
+  - Используются временные очереди `AnonymousQueue`, которые гарантирует, что RabbitMQ не хранит лишние данные, как только инстанс приложения выключается, его очередь и все привязки удаляются автоматически, освобождая память брокера
+- Поднимаем контейнеры
+  ```
+  docker compose -f .\docker-compose-queue.yml up -d
+  ```
+- Подписываемся на канал `"/post/feed/posted/" + myUserId` в консоли браузера. В `myUserId` указать id юзера, который является другом юзера с id `1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6`
+  ```
+  var myUserId = '082aa703-1a3c-4e22-a4c5-cdf549d2535f';
+  var myTopic = "/post/feed/posted/" + myUserId;
+  var socket = new WebSocket('ws://localhost:8081/ws?userId=' + myUserId);
+  var isSubscribed = false;
+  
+  socket.onopen = () => {
+      console.log('--- СОЕДИНЕНИЕ УСТАНОВЛЕНО ---');
+      socket.send("CONNECT\naccept-version:1.1,1.0\n\n\0");
+  };
+  
+  socket.onmessage = (e) => {
+      console.log('ОТВЕТ СЕРВЕРА:', e.data);
+  
+      if (e.data.includes("CONNECTED") && !isSubscribed) {
+        socket.send("SUBSCRIBE\nid:sub-0\ndestination:" + myTopic + "\n\n\0");
+        console.log('--- ПОДПИСКА ОФОРМЛЕНА НА: ' + myTopic + ' ---');
+        isSubscribed = true;
+      }
+      
+      if (e.data.includes("ERROR")) {
+          console.error('Ошибка авторизации или протокола:', e.data);
+      }
+  };
+  
+  socket.onerror = (err) => console.error('ОШИБКА СОКЕТА:', err);
+  ```
+- Вызываем метод авторизации POST `http://localhost:8081/login` для юзера с id `1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6`
+- Создаем новый пост POST `http://localhost:8081/post/create` для юзера с id `1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6`
+- Всем друзьям юзера с id `1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6`, которые подписаны на ленту, будет отправлено сообщение через WebSocket
+  ```
+  {"postId":"e9a03a65-1bc3-4691-8140-1d622272d393","postText":"Текст поста","author_user_id":"1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6"}
+  ```
+
 ## Шардирование
 
 - Создана таблица `dialog_messages(id, dialog_id, sender_id, recipient_id, message_text, is_read, created_at, updated_at)`. Поле `dialog_id` является уникальным хешем от пары UUID пользователей, он всегда будет одинаковый для любого направления переписки (user1 -> user2 или user2 -> user1)

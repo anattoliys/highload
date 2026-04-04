@@ -51,7 +51,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"id\": \"1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6\",\r\n  \"password\": \"12345678\"\r\n}",
+              "raw": "{\r\n    \"id\": \"1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6\",\r\n    \"password\": \"12345678\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -240,7 +240,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwMzU5ZDUwMi0wOGJhLTQ3YjctYmExMC0xZGY1ZmFkOTAyN2MiLCJpYXQiOjE3NzI2MzY4NTIsImV4cCI6MTc3MjcyMzI1Mn0.pHQeLhBsMIjRyM2skQLkG9w7SIFMMg_SikQe_U_FYkA4TKmNFpwyyH99yNSU8NibgFqB6dO6aUQlvXQYvqrSjg",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzUzMjkzNjksImV4cCI6MTc3NTQxNTc2OX0.7IYKPy5k-0q377i5d5AGTFWIWJJFKTR-fcjstvoYJsJ60kTlcEwGs6etxQ1doShmrF26GDqcDpCoOESrUx4sww",
                   "type": "string"
                 }
               ]

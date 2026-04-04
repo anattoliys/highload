@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id("org.openapi.generator") version "7.8.0"
+    id 'org.openapi.generator' version '7.8.0'
 }
 
 group = 'ru.project'
@@ -32,6 +32,15 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // RabbitMq
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    // Netty
+    implementation 'io.projectreactor.netty:reactor-netty'
 
     // Lombok
     compileOnly("org.projectlombok:lombok:1.18.42")
@@ -79,7 +88,7 @@ specifications.each { spec ->
                 useSpringBoot3      : 'true',
                 dateLibrary         : 'java8',
                 useJakartaEe        : 'true',
-                skipDefaultInterface: "true"
+                skipDefaultInterface: 'true'
         ]
     }
 }
