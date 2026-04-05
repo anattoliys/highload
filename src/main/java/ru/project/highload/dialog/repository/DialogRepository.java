@@ -16,7 +16,7 @@ public class DialogRepository {
 
     public List<Message> findAllByDialogId(UUID currentUser, UUID dialogId) {
         return jdbcClient.sql("""
-                        SELECT sender_id, recipient_id, message_text, is_read, created_at
+                        SELECT id, dialog_id, sender_id, recipient_id, message_text, is_read, created_at, updated_at
                         FROM dialog_messages
                         WHERE dialog_id = :dialogId
                         ORDER BY
@@ -25,6 +25,15 @@ public class DialogRepository {
                         """)
                 .param("current", currentUser)
                 .param("dialogId", dialogId)
+                .query(Message.class)
+                .list();
+    }
+
+    public List<Message> findAll() {
+        return jdbcClient.sql("""
+                        SELECT id, dialog_id, sender_id, recipient_id, message_text, is_read, created_at, updated_at
+                        FROM dialog_messages
+                        """)
                 .query(Message.class)
                 .list();
     }

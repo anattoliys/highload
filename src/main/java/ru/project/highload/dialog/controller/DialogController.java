@@ -2,6 +2,8 @@ package ru.project.highload.dialog.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.project.highload.dialog.domain.Message;
 import ru.project.highload.dialog.mapper.DialogMapper;
@@ -30,6 +32,16 @@ public class DialogController implements DialogApi {
     @Override
     public ResponseEntity<Void> dialogUserIdSendPost(String userId, DialogUserIdSendPostRequest dialogUserIdSendPostRequest) {
         service.sendMessage(SecurityUtils.getCurrentUserId(), UUID.fromString(userId), dialogUserIdSendPostRequest.getText());
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/dialog/migrate",
+            produces = {"application/json"}
+    )
+    public ResponseEntity<Void> migrate() {
+        service.migrateToTarantool();
         return ResponseEntity.ok().build();
     }
 }

@@ -12,20 +12,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    public static final String POST_EXCHANGE = "post.updates.exchange";
-
-    @Bean
-    public TopicExchange postExchange() {
-        return new TopicExchange(POST_EXCHANGE);
-    }
-
-    @Bean
-    public Queue instanceQueue() {
-        return new AnonymousQueue();
-    }
-
-    @Bean
-    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
+//    public static final String POST_EXCHANGE = "post.updates.exchange";
+//
+//    @Bean
+//    public TopicExchange postExchange() {
+//        return new TopicExchange(POST_EXCHANGE);
+//    }
+//
+//    @Bean
+//    public Queue instanceQueue() {
+//        return new AnonymousQueue();
+//    }
+//
+//    @Bean
+//    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
+//        return new Jackson2JsonMessageConverter(objectMapper);
+//    }
 }
