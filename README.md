@@ -1,5 +1,21 @@
 # highload
 
+## In-Memory СУБД
+
+- сгенерировал 300 тысяч записей в таблице dialog_messages
+- реализовал выборку из tarantool батчами, так как было ограничение по передаче данных по сети 1 мб. Сортировку вынес в java
+- провел нагрузочное тестирование `до` вынесения данных из postgres в tarantool, отчеты приложены в папке `/jmeter/reports/in-memory/with-postgres/`
+  - метод GET "/dialog/{user_id}/list" отрабатывает в среднем 25+ секунд
+- провел нагрузочное тестирование `после` вынесения данных из postgres в tarantool, отчеты приложены в папке `/jmeter/reports/in-memory/with-tarantool/`
+  - метод GET "/dialog/{user_id}/list" отрабатывает гораздо быстрее, около 4 секунд
+- чтобы проверить локально, необходимо выполнить шаги:
+  - запустить миграцию данных из postgres в tarantool вызвав метод POST `/dialog/migrate`
+    - подключиться к tarantool `docker exec -it tarantool console` и убедить, все записи были мигрированы из postgres в tarantool `box.space.messages:len()`
+  - авторизоваться под юзером `1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6` вызвав метод POST `http://localhost:8081/login`
+    - body `{"id": "1a03ae84-5a4c-4dfd-b99b-ccbf9677acb6", "password": "12345678"}`
+  - получить диалоги методом GET `http://localhost:8081/dialog/902731e2-92bb-4884-a2d2-4ed94061860d/list`
+    - в заголовке `Authorization` указать ранее полученный токен методом POST `http://localhost:8081/login`
+
 ## Очереди и отложенное выполнение
 
 - Был доработан функционал ленты новостей, поддерживающий масштабируемость и доставку постов друзьям автора через RabbitMQ и WebSocket

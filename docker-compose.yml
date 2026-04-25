@@ -38,6 +38,19 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: tarantool
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool:/opt/tarantool
+    environment:
+      - TT_USER=admin
+      - TT_PASSWORD=admin
+    command: tarantool /opt/tarantool/init.lua
+    networks:
+      - highload
   app:
     build:
       context: .
@@ -49,9 +62,12 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/highload-db
       - SPRING_DATASOURCE_USERNAME=highload-user
       - SPRING_DATASOURCE_PASSWORD=12345678
+      - JDK_JAVA_OPTIONS=--add-opens=java.base/sun.nio.ch=ALL-UNNAMED
     depends_on:
       postgres:
         condition: service_healthy
+      tarantool:
+        condition: service_started
     networks:
       - highload
 

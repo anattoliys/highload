@@ -1,16 +1,15 @@
 package ru.project.highload.post.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import ru.project.highload.post.config.RabbitConfig;
 import ru.project.highload.post.domain.Post;
 import ru.project.highload.post.domain.PostEvent;
 import ru.project.highload.post.repository.PostRepository;
+import ru.project.highload.utils.JsonUtils;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -21,9 +20,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final JsonUtils jsonUtils;
     private final PostRepository repository;
     private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
     private final RabbitTemplate rabbitTemplate;
 
     public UUID create(UUID authorId, Post post) {
@@ -33,7 +32,7 @@ public class PostService {
         var postId = repository.save(authorId, post.getText());
         Post dbPost = getById(postId);
 
-        redisTemplate.opsForValue().set("post:" + postId, serialize(dbPost), Duration.ofDays(7));
+        redisTemplate.opsForValue().set("post:" + postId, jsonUtils.serialize(dbPost), Duration.ofDays(7));
 
         PostEvent event = new PostEvent(
                 postId.toString(),
@@ -50,7 +49,7 @@ public class PostService {
             }
 
             String routingKey = "post.feed.posted." + friendId;
-            rabbitTemplate.convertAndSend(RabbitConfig.POST_EXCHANGE, routingKey, event);
+//            rabbitTemplate.convertAndSend(RabbitConfig.POST_EXCHANGE, routingKey, event);
         }
 
         return postId;
@@ -63,7 +62,7 @@ public class PostService {
         }
 
         Post updatedPost = getById(post.getId());
-        redisTemplate.opsForValue().set("post:" + post.getId(), serialize(updatedPost), Duration.ofDays(7));
+        redisTemplate.opsForValue().set("post:" + post.getId(), jsonUtils.serialize(updatedPost), Duration.ofDays(7));
     }
 
     public void delete(UUID authorId, UUID id) {
@@ -108,7 +107,7 @@ public class PostService {
 
         return postJsons.stream()
                 .filter(Objects::nonNull)
-                .map(this::deserialize)
+                .map(json -> jsonUtils.deserialize(json, Post.class))
                 .filter(Objects::nonNull)
                 .toList();
     }
@@ -129,7 +128,7 @@ public class PostService {
         Map<String, String> postsData = new HashMap<>();
 
         for (Post post : posts) {
-            String json = serialize(post);
+            String json = jsonUtils.serialize(post);
             if (json != null) {
                 postIds.add(post.getId().toString());
                 postsData.put("post:" + post.getId(), json);
@@ -142,22 +141,6 @@ public class PostService {
         if (!postIds.isEmpty()) {
             redisTemplate.opsForList().rightPushAll(feedKey, postIds);
             redisTemplate.expire(feedKey, Duration.ofHours(24));
-        }
-    }
-
-    private String serialize(Post post) {
-        try {
-            return objectMapper.writeValueAsString(post);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private Post deserialize(String json) {
-        try {
-            return objectMapper.readValue(json, Post.class);
-        } catch (Exception e) {
-            return null;
         }
     }
 }

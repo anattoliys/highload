@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/user/search").permitAll()
                         .requestMatchers("/post/get/{id}").permitAll()
+                        .requestMatchers("/dialog/migrate").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class);

@@ -33,6 +33,17 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: tarantool
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool:/opt/tarantool
+    environment:
+      - TT_USER=admin
+      - TT_PASSWORD=admin
+    command: tarantool /opt/tarantool/init.lua
 
 networks:
   highload:

@@ -33,6 +33,9 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // Tarantool
+    implementation 'io.tarantool:cartridge-driver:0.14.3'
+
     // Websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
