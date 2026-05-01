@@ -1,12 +1,12 @@
 FROM eclipse-temurin:17-jdk-alpine AS builder
-WORKDIR /app
+WORKDIR /highload
 COPY . .
-RUN ./gradlew clean bootJar -x test --no-daemon
+RUN chmod +x gradlew && sed -i 's/\r$//' gradlew
+RUN ./gradlew bootJar -x test --no-daemon
 
-
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
+FROM eclipse-temurin:17-jre-alpine AS runner
+WORKDIR /highload
 USER nobody
-COPY --from=builder /app/build/libs/*.jar app.jar
-EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ARG MODULE_NAME
+COPY --from=builder /highload/${MODULE_NAME}/build/libs/*.jar highload.jar
+ENTRYPOINT ["java", "-jar", "highload.jar"]
