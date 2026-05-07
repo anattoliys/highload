@@ -59,12 +59,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/login",
+              "raw": "http://localhost:8083/login",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8081",
+              "port": "8083",
               "path": [
                 "login"
               ]
@@ -128,7 +128,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmMDlmNjhjNC05NGE1LTRjZTAtYjVlZS0wN2JhYWU2Zjg3YzMiLCJpYXQiOjE3NzE0Mzc1NjgsImV4cCI6MTc3MTUyMzk2OH0.PbOF8qAEesNZ5zDKaRHXvnIFOYG29xtz8cj2sDH9spAOj6_ViXuw704gXziSHABjX5Lv-MBNHmjzyejcwAMy6w",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzgxODk5MDQsImV4cCI6MTc3ODI3NjMwNH0.wK5H2m4HcaAFpN9ep0NXxg7MgwZlh4oiKiFNnP7EkeN7kpL66R1r2rgzT8qYVOnPDXZv38ZUr0NKUxVBUDpEbA",
                   "type": "string"
                 }
               ]
@@ -145,7 +145,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/user/get/678a3381-83c2-4f51-9edc-ad9d360552d9",
+              "raw": "http://localhost:8081/user/get/a78da250-be31-4458-8775-a2b1caecc8ec",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -154,7 +154,7 @@
               "path": [
                 "user",
                 "get",
-                "678a3381-83c2-4f51-9edc-ad9d360552d9"
+                "a78da250-be31-4458-8775-a2b1caecc8ec"
               ]
             }
           },
@@ -431,7 +431,7 @@
       ]
     },
     {
-      "name": "dialog",
+      "name": "dialog legacy",
       "item": [
         {
           "name": "send post",
@@ -441,7 +441,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzQxMjIzODcsImV4cCI6MTc3NDIwODc4N30.AjmW2VfMHaSPZJF6r4JNNGs-ZGQRlB5hUtXvRtTUBSP3agyptAKIbShXuWqB0SNVNkAVu2tsJQQIAQAT_FtXQA",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzgxOTA0MjIsImV4cCI6MTc3ODI3NjgyMn0.ApHr7s0GJR13fUMJLMYAgsucuhHFRANzo1WUbkq_4hacskHOud2wT6CnCEX5-Ux4SAO4pAEBvAP2L0408fHpng",
                   "type": "string"
                 }
               ]
@@ -458,7 +458,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/dialog/0e9118ad-31b8-44a9-82bc-73154c1aa916/send",
+              "raw": "http://localhost:8081/dialog/902731e2-92bb-4884-a2d2-4ed94061860d/send",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -466,7 +466,7 @@
               "port": "8081",
               "path": [
                 "dialog",
-                "0e9118ad-31b8-44a9-82bc-73154c1aa916",
+                "902731e2-92bb-4884-a2d2-4ed94061860d",
                 "send"
               ]
             }
@@ -481,13 +481,19 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzY5NzExNTQsImV4cCI6MTc3NzA1NzU1NH0.XZFuei75S5dZrpBkltI_ZG5GeIezUrpHu0GRloSB9h7IO2yjLC_xIicpq3JqJ3V5XJjsV_HU1ZdWUCYGIf4VTg",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzgxOTA0MjIsImV4cCI6MTc3ODI3NjgyMn0.ApHr7s0GJR13fUMJLMYAgsucuhHFRANzo1WUbkq_4hacskHOud2wT6CnCEX5-Ux4SAO4pAEBvAP2L0408fHpng",
                   "type": "string"
                 }
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "x-request-id",
+                "value": "354",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "http://localhost:8081/dialog/902731e2-92bb-4884-a2d2-4ed94061860d/list",
               "protocol": "http",
@@ -516,6 +522,102 @@
                 "localhost"
               ],
               "port": "8081",
+              "path": [
+                "dialog",
+                "migrate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "item": [
+        {
+          "name": "send post",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzgxODk5MDQsImV4cCI6MTc3ODI3NjMwNH0.wK5H2m4HcaAFpN9ep0NXxg7MgwZlh4oiKiFNnP7EkeN7kpL66R1r2rgzT8qYVOnPDXZv38ZUr0NKUxVBUDpEbA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"text\": \"text messag 1\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8086/dialog/902731e2-92bb-4884-a2d2-4ed94061860d/send",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "dialog",
+                "902731e2-92bb-4884-a2d2-4ed94061860d",
+                "send"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get user list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxYTAzYWU4NC01YTRjLTRkZmQtYjk5Yi1jY2JmOTY3N2FjYjYiLCJpYXQiOjE3NzgxODk5MDQsImV4cCI6MTc3ODI3NjMwNH0.wK5H2m4HcaAFpN9ep0NXxg7MgwZlh4oiKiFNnP7EkeN7kpL66R1r2rgzT8qYVOnPDXZv38ZUr0NKUxVBUDpEbA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8086/dialog/902731e2-92bb-4884-a2d2-4ed94061860d/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "dialog",
+                "902731e2-92bb-4884-a2d2-4ed94061860d",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "migrate to tarantool",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8086/dialog/migrate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
               "path": [
                 "dialog",
                 "migrate"

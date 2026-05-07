@@ -1,1 +1,6 @@
 rootProject.name = 'highload'
+include 'app'
+include 'auth'
+include 'common'
+include 'dialog'
+include 'openapi'

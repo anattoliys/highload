@@ -32,4 +32,18 @@ if not box.info.ro then
 
         return setmetatable(res, { __serialize = 'seq' })
     end
+
+    function save_message(id, dialog_id, sender_id, recipient_id, message_text)
+        local created_at = os.date('!%Y-%m-%dT%H:%M:%SZ')
+        return box.space.messages:insert({
+            id,
+            dialog_id,
+            sender_id,
+            recipient_id,
+            message_text,
+            false,
+            created_at,
+            nil
+        })
+    end
 end
