@@ -27,12 +27,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/user/register",
+              "raw": "http://localhost/user/register",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8081",
               "path": [
                 "user",
                 "register"
@@ -93,12 +92,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/user/search?first_name=ана&last_name=бел",
+              "raw": "http://localhost/user/search?first_name=им&last_name=фа",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8081",
               "path": [
                 "user",
                 "search"
@@ -106,11 +104,11 @@
               "query": [
                 {
                   "key": "first_name",
-                  "value": "ана"
+                  "value": "им"
                 },
                 {
                   "key": "last_name",
-                  "value": "бел"
+                  "value": "фа"
                 }
               ]
             }

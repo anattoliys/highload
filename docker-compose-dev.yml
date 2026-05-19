@@ -1,13 +1,60 @@
 services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: highload-postgres
+  postgres-master:
+    image: bitnami/postgresql:latest
+    container_name: postgres-master
     environment:
-      POSTGRES_DB: highload-db
-      POSTGRES_USER: highload-user
-      POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_DATABASE: highload-db
+      POSTGRESQL_USERNAME: highload-user
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
     ports:
       - "5432:5432"
+    networks:
+      - highload
+  postgres-slave-1:
+    image: bitnami/postgresql:latest
+    container_name: postgres-slave-1
+    environment:
+      POSTGRESQL_MASTER_HOST: postgres-master
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+    depends_on:
+      - postgres-master
+    networks:
+      - highload
+  postgres-slave-2:
+    image: bitnami/postgresql:latest
+    container_name: postgres-slave-2
+    environment:
+      POSTGRESQL_MASTER_HOST: postgres-master
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+    depends_on:
+      - postgres-master
+    networks:
+      - highload
+  haproxy:
+    image: haproxy:2.8-alpine
+    container_name: highload-haproxy
+    ports:
+      - "5433:5432"
+      - "8404:8404"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - postgres-slave-1
+      - postgres-slave-2
     networks:
       - highload
   redis:

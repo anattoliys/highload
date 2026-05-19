@@ -8,10 +8,24 @@ spring:
   application:
     name: highload-app
   datasource:
-    url: jdbc:postgresql://citus-master:5432/postgres
-    username: postgres
+    url: jdbc:postgresql://postgres-master:5432/highload-db
+    username: highload-user
     password: 12345678
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 15
+      pool-name: HikariPool-Master
+    slave:
+      url: jdbc:postgresql://haproxy:5432/highload-db
+      username: highload-user
+      password: 12345678
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 30
+        pool-name: HikariPool-Slave
+        max-lifetime: 35000
+        idle-timeout: 30000
+        keepalive-time: 15000
   data:
     redis:
       host: redis
@@ -55,3 +69,5 @@ management:
 logging:
   pattern:
     level: "%5p [appName: ${spring.application.name:}, traceId: %X{traceId:-}, spanId: %X{spanId:-}, xRequestId: %X{x-request-id:-}]"
+  level:
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG

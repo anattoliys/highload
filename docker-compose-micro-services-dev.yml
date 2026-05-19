@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: highload-postgres
+    environment:
+      POSTGRES_DB: highload-db
+      POSTGRES_USER: highload-user
+      POSTGRES_PASSWORD: 12345678
+    ports:
+      - "5432:5432"
+    networks:
+      - highload
+  redis:
+    image: redis:7-alpine
+    container_name: highload-redis
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - highload
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: highload-redis-insight
+    ports:
+      - "5540:5540"
+    networks:
+      - highload
+    depends_on:
+      redis:
+        condition: service_healthy
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: tarantool
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool:/opt/tarantool
+    environment:
+      - TT_USER=admin
+      - TT_PASSWORD=admin
+    command: tarantool /opt/tarantool/init.lua
+
+networks:
+  highload:
+    name: highload
+    driver: bridge
