@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.project.highload.post.domain.Post;
 import ru.project.highload.post.domain.PostEvent;
 import ru.project.highload.post.repository.PostRepository;
@@ -74,10 +75,12 @@ public class PostService {
         redisTemplate.delete("post:" + id);
     }
 
+    @Transactional(readOnly = true)
     public Post getById(UUID id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
 
+    @Transactional(readOnly = true)
     public List<Post> getFeeds(UUID userId, BigDecimal offset, BigDecimal limit) {
         String feedKey = "feed:" + userId;
         int start = offset.intValue();

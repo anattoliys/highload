@@ -32,7 +32,7 @@ BEGIN
             INSERT INTO posts (author_id, text, created_at)
             VALUES (
                 current_friend_id,
-                'Рандомный текст поста #' || j || ' от друга Имя_друга_' || i || '. ' || md5(random()::text),
+                'Рандомный текст поста #' || j || ' от друга Имя_друга_' || i || '. ' || gen_random_uuid()::text,
                 NOW() - (i || ' days')::INTERVAL
             );
         END LOOP;

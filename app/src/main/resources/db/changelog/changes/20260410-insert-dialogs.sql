@@ -15,7 +15,7 @@ BEGIN
         v_dialog_id,
         v_sender_id,
         v_recipient_id,
-        'Сообщение: ' || md5(random()::text),
+        'Сообщение: ' || gen_random_uuid()::text,
         TRUE
     FROM generate_series(1, 300000);
 

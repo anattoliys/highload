@@ -1,11 +1,23 @@
 package ru.project.highload.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
-public class TransactionRoutingDataSource {
-//        extends AbstractRoutingDataSource {
-//
+public class TransactionRoutingDataSource extends AbstractRoutingDataSource {
+
+    @Override
+    protected Object determineCurrentLookupKey() {
+        if (TransactionSynchronizationManager.isActualTransactionActive() &&
+                TransactionSynchronizationManager.isCurrentTransactionReadOnly()) {
+            log.info("=== Sql запрос отправлен на SLAVE ===");
+            return "slave";
+        }
+        log.info("=== Sql запрос отправлен на MASTER ===");
+        return "master";
+    }
+
 //    private final AtomicInteger counter = new AtomicInteger(0);
 //
 //    @Override
