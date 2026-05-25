@@ -1,0 +1,98 @@
+services:
+  postgres-master:
+    image: bitnami/postgresql:latest
+    container_name: postgres-master
+    environment:
+      POSTGRESQL_DATABASE: highload-db
+      POSTGRESQL_USERNAME: highload-user
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+    ports:
+      - "5432:5432"
+    networks:
+      - highload
+  postgres-slave-1:
+    image: bitnami/postgresql:latest
+    container_name: postgres-slave-1
+    environment:
+      POSTGRESQL_MASTER_HOST: postgres-master
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+    depends_on:
+      - postgres-master
+    networks:
+      - highload
+  postgres-slave-2:
+    image: bitnami/postgresql:latest
+    container_name: postgres-slave-2
+    environment:
+      POSTGRESQL_MASTER_HOST: postgres-master
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_PASSWORD: 12345678
+      POSTGRESQL_POSTGRES_PASSWORD: 12345678
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replica_user
+      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+    depends_on:
+      - postgres-master
+    networks:
+      - highload
+  haproxy:
+    image: haproxy:2.8-alpine
+    container_name: highload-haproxy
+    ports:
+      - "5433:5432"
+      - "8404:8404"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - postgres-slave-1
+      - postgres-slave-2
+    networks:
+      - highload
+  redis:
+    image: redis:7-alpine
+    container_name: highload-redis
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - highload
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: highload-redis-insight
+    ports:
+      - "5540:5540"
+    networks:
+      - highload
+    depends_on:
+      redis:
+        condition: service_healthy
+  tarantool:
+    image: tarantool/tarantool:latest
+    container_name: tarantool
+    ports:
+      - "3301:3301"
+    volumes:
+      - ./tarantool:/opt/tarantool
+    environment:
+      - TT_USER=admin
+      - TT_PASSWORD=admin
+    command: tarantool /opt/tarantool/init.lua
+
+networks:
+  highload:
+    name: highload
+    driver: bridge

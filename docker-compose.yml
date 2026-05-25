@@ -1,71 +1,40 @@
 services:
-  postgres-master:
-    image: bitnami/postgresql:latest
-    container_name: postgres-master
+  app-postgres:
+    image: postgres:17-alpine
+    container_name: app-postgres
     environment:
-      POSTGRESQL_DATABASE: highload-db
-      POSTGRESQL_USERNAME: highload-user
-      POSTGRESQL_PASSWORD: 12345678
-      POSTGRESQL_POSTGRES_PASSWORD: 12345678
-      POSTGRESQL_REPLICATION_MODE: master
-      POSTGRESQL_REPLICATION_USER: replica_user
-      POSTGRESQL_REPLICATION_PASSWORD: 12345678
+      POSTGRES_DB: app-db
+      POSTGRES_USER: app-user
+      POSTGRES_PASSWORD: 12345678
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app-user -d app-db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     networks:
       - highload
+  counter-postgres:
+    image: postgres:17-alpine
+    container_name: counter-postgres
+    environment:
+      POSTGRES_DB: counter-db
+      POSTGRES_USER: counter-user
+      POSTGRES_PASSWORD: 12345678
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U highload-user -d highload-db" ]
+      test: [ "CMD-SHELL", "pg_isready -U counter-user -d counter-db" ]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 5
-  postgres-slave-1:
-    image: bitnami/postgresql:latest
-    container_name: postgres-slave-1
-    environment:
-      POSTGRESQL_MASTER_HOST: postgres-master
-      POSTGRESQL_MASTER_PORT_NUMBER: 5432
-      POSTGRESQL_PASSWORD: 12345678
-      POSTGRESQL_POSTGRES_PASSWORD: 12345678
-      POSTGRESQL_REPLICATION_MODE: slave
-      POSTGRESQL_REPLICATION_USER: replica_user
-      POSTGRESQL_REPLICATION_PASSWORD: 12345678
-    depends_on:
-      - postgres-master
-    networks:
-      - highload
-  postgres-slave-2:
-    image: bitnami/postgresql:latest
-    container_name: postgres-slave-2
-    environment:
-      POSTGRESQL_MASTER_HOST: postgres-master
-      POSTGRESQL_MASTER_PORT_NUMBER: 5432
-      POSTGRESQL_PASSWORD: 12345678
-      POSTGRESQL_POSTGRES_PASSWORD: 12345678
-      POSTGRESQL_REPLICATION_MODE: slave
-      POSTGRESQL_REPLICATION_USER: replica_user
-      POSTGRESQL_REPLICATION_PASSWORD: 12345678
-    depends_on:
-      - postgres-master
-    networks:
-      - highload
-  haproxy:
-    image: haproxy:2.8-alpine
-    container_name: highload-haproxy
     ports:
-      - "5433:5432"
-      - "8404:8404"
-    volumes:
-      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-    depends_on:
-      - postgres-slave-1
-      - postgres-slave-2
+      - "7432:5432"
     networks:
       - highload
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: highload-redis
-    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 512mb --maxmemory-policy noeviction --appendonly yes
     ports:
       - "6379:6379"
     networks:
@@ -98,6 +67,34 @@ services:
     command: tarantool /opt/tarantool/init.lua
     networks:
       - highload
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: highload-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:29092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    healthcheck:
+      test: [ "CMD", "kafka-cluster", "cluster-id", "--bootstrap-server", "localhost:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - highload
   app:
     build:
       context: .
@@ -106,24 +103,19 @@ services:
       args:
         MODULE_NAME: "app"
     environment:
-      - SPRING_DATASOURCE_MASTER_URL=jdbc:postgresql://postgres-master:5432/highload-db
-      - SPRING_DATASOURCE_SLAVE_URL=jdbc:postgresql://haproxy:5432/highload-db
-      - SPRING_DATASOURCE_USERNAME=highload-user
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://app-postgres:5432/app-db
+      - SPRING_DATASOURCE_USERNAME=app-user
       - SPRING_DATASOURCE_PASSWORD=12345678
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - JDK_JAVA_OPTIONS=--add-opens=java.base/sun.nio.ch=ALL-UNNAMED
     depends_on:
-      postgres-master:
+      app-postgres:
         condition: service_healthy
-      haproxy:
-        condition: service_started
       redis:
         condition: service_healthy
     networks:
       - highload
-    deploy:
-      replicas: 2
   auth:
     build:
       context: .
@@ -153,16 +145,30 @@ services:
         condition: service_started
     networks:
       - highload
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: highload-nginx
+  counter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        MODULE_NAME: "counter"
+    container_name: highload-counter
     ports:
-      - "80:80"
-      - "8080:8080"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://counter-postgres:5432/counter-db
+      - SPRING_DATASOURCE_USERNAME=counter-user
+      - SPRING_DATASOURCE_PASSWORD=12345678
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - app
+      counter-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - highload
 
