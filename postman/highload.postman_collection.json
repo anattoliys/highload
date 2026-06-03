@@ -627,6 +627,32 @@
       ]
     },
     {
+      "name": "counter",
+      "item": [
+        {
+          "name": "get unread count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8085/counters/unread/222",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "counters",
+                "unread",
+                "222"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "prometeus",
       "request": {
         "method": "GET",
