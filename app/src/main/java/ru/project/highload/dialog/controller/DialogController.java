@@ -1,5 +1,6 @@
 package ru.project.highload.dialog.controller;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,12 +22,14 @@ public class DialogController implements DialogApi {
     private final DialogService service;
 
     @Override
+    @Timed(value = "app_dialog_requests", description = "RED metrics for get dialog messages", histogram = true, percentiles = {0.5, 0.9, 0.95, 0.99})
     public ResponseEntity<List<DialogMessage>> dialogUserIdListGet(String userId) {
         List<Message> messages = service.findDialog(UUID.fromString(userId));
         return ResponseEntity.ok(mapper.toDto(messages));
     }
 
     @Override
+    @Timed(value = "app_dialog_requests", description = "RED metrics for send dialog messages", histogram = true, percentiles = {0.5, 0.9, 0.95, 0.99})
     public ResponseEntity<Void> dialogUserIdSendPost(String userId, DialogUserIdSendPostRequest dialogUserIdSendPostRequest) {
         service.sendMessage(UUID.fromString(userId), dialogUserIdSendPostRequest.getText());
         return ResponseEntity.ok().build();

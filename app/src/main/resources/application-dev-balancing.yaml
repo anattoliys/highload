@@ -11,6 +11,17 @@ spring:
     hikari:
       maximum-pool-size: 15
       pool-name: HikariPool-Master
+    slave:
+      url: jdbc:postgresql://localhost:5433/highload-db
+      username: highload-user
+      password: 12345678
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 30
+        pool-name: HikariPool-Slave
+        max-lifetime: 35000
+        idle-timeout: 30000
+        keepalive-time: 15000
 
   data:
     redis:
@@ -32,7 +43,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus, health
+        include: prometheus
   metrics:
     export:
       prometheus:

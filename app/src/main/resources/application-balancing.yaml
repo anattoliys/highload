@@ -1,20 +1,34 @@
 server:
   port: 8081
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: "%t %m %U %s %Dms"
 spring:
   application:
-    name: app
+    name: highload-app
   datasource:
-    url: jdbc:postgresql://localhost:5432/highload-db
+    url: jdbc:postgresql://postgres-master:5432/highload-db
     username: highload-user
     password: 12345678
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 15
       pool-name: HikariPool-Master
-
+    slave:
+      url: jdbc:postgresql://haproxy:5432/highload-db
+      username: highload-user
+      password: 12345678
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 30
+        pool-name: HikariPool-Slave
+        max-lifetime: 35000
+        idle-timeout: 30000
+        keepalive-time: 15000
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
   liquibase:
     enabled: true
@@ -26,13 +40,13 @@ jwt:
 
 services:
   dialog:
-    url: "http://localhost:8086"
+    url: "http://highload-dialog:8086"
 
 management:
   endpoints:
     web:
       exposure:
-        include: prometheus, health
+        include: prometheus
   metrics:
     export:
       prometheus:
